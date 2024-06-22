@@ -396,3 +396,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/EntityFrameworkCoreIntroduction/DBFirst/Data/Configuration.cs
