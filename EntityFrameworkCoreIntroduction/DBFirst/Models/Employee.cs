@@ -26,9 +26,9 @@ namespace SoftUni.Models
         public virtual Address? Address { get; set; }
         public virtual Department Department { get; set; } = null!;
         public virtual Employee? Manager { get; set; }
+
         public virtual ICollection<Department> Departments { get; set; }
         public virtual ICollection<Employee> InverseManager { get; set; }
-
         public virtual ICollection<EmployeeProject> EmployeesProjects { get; set; }
     }
 }
