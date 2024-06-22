@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using SoftUni.Data;
 
 namespace SoftUni.Models
 {
@@ -26,7 +27,7 @@ namespace SoftUni.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=Asus-Tuf;Database=SoftUni;Integrated Security=True;");
+                optionsBuilder.UseSqlServer(Configuration.ConnectionString);
             }
         }
 
