@@ -7,12 +7,13 @@ public class StartUp
 {
     public static void Main()
     {
+         // Problem 01. ---> Scaffold DB
         var context = new SoftUniContext();
 
-        Console.WriteLine(AddNewAddressToEmployee(context));
+        Console.WriteLine(GetEmployeesInPeriod(context));
     }
 
-    // Problem 01.
+    // Problem 02.
     public static string GetEmployeesFullInformation(SoftUniContext context)
     {
         StringBuilder output = new StringBuilder();
@@ -36,7 +37,7 @@ public class StartUp
         return output.ToString().TrimEnd();
     }
 
-    // Problem 02.
+    // Problem 03.
     public static string GetEmployeesWithSalaryOver50000(SoftUniContext context)
     {
         StringBuilder output = new StringBuilder();
@@ -59,7 +60,7 @@ public class StartUp
         return output.ToString().TrimEnd();
     }
 
-    // Problem 03.
+    // Problem 04.
     public static string GetEmployeesFromResearchAndDevelopment(SoftUniContext context)
     {
         StringBuilder output = new StringBuilder();
@@ -85,7 +86,7 @@ public class StartUp
         return output.ToString().TrimEnd();
     }
 
-    // Problem 04.
+    // Problem 05.
     public static string AddNewAddressToEmployee(SoftUniContext context)
     {
         StringBuilder output = new StringBuilder();
@@ -115,6 +116,46 @@ public class StartUp
                 .AppendLine(addressText);
         }
         
+        return output.ToString().TrimEnd();
+    }
+
+    // Problem 06.
+    public static string GetEmployeesInPeriod(SoftUniContext context)
+    {
+        var output = new StringBuilder();
+
+        var employees = context.Employees
+            .Take(10)
+            .Select(e => new
+            {
+                EmployeeFullName = $"{e.FirstName} {e.LastName}",
+                ManagerFullName = $"{e.Manager.FirstName} {e.Manager.LastName}",
+                Projects = e.EmployeesProjects
+                    .Where(ep =>
+                        ep.Project.StartDate.Year >= 2001
+                     && ep.Project.StartDate.Year <= 2003)
+                    .Select(ep => new
+                    {
+                        ProjectName = ep.Project.Name,
+                        ep.Project.StartDate,
+                        EndDate = ep.Project.EndDate.HasValue ?
+                        ep.Project.EndDate.Value.ToString("M/d/yyyy h:mm:ss tt") : "not finished"
+                    })
+            }).ToList();
+
+        foreach( var employee in employees)
+        {
+            output.AppendLine($"{employee.EmployeeFullName} - Manager: {employee.ManagerFullName}");
+
+            if (employee.Projects.Any())
+            {
+                foreach (var project in employee.Projects)
+                {
+                    output.AppendLine($"--{project.ProjectName} - {project.StartDate:M/d/yyyy h:mm:ss tt} - {project.EndDate}");
+                }
+            }
+        }
+
         return output.ToString().TrimEnd();
     }
 }
