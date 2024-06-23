@@ -1,6 +1,8 @@
 ﻿
+using Microsoft.EntityFrameworkCore;
 using SoftUni.Models;
 using System.Diagnostics;
+using System.Runtime.Loader;
 using System.Text;
 
 public class StartUp
@@ -10,7 +12,7 @@ public class StartUp
          // Problem 01. ---> Scaffold DB
         var context = new SoftUniContext();
 
-        Console.WriteLine(GetEmployeesInPeriod(context));
+        Console.WriteLine(GetEmployee147(context));
     }
 
     // Problem 02.
@@ -158,4 +160,66 @@ public class StartUp
 
         return output.ToString().TrimEnd();
     }
+
+    // Problem 07.
+    public static string GetAddressesByTown(SoftUniContext context)
+    {
+        var output = new StringBuilder();
+
+        var addresses = context.Addresses
+            .OrderByDescending(a => a.Employees.Count())
+            .ThenBy(a => a.Town.Name)
+            .ThenBy(a => a.AddressText)
+            .Take(10)
+            .Select(a => new
+            {
+                a.AddressText,
+                TownName = a.Town.Name,
+                EmployeesCount = a.Employees.Count()
+
+            }).ToList();
+
+        foreach ( var a in addresses)
+        {
+            output.AppendLine($"{a.AddressText}, {a.TownName} - {a.EmployeesCount} employees");
+        }
+
+        return output.ToString().TrimEnd();
+    }
+
+    // Problem 08.
+    public static string GetEmployee147(SoftUniContext context)
+    {
+        var employee = context.Employees
+                .Where(e => e.EmployeeId == 147)
+                .Select(e => new
+                {
+                    e.FirstName,
+                    e.LastName,
+                    e.JobTitle,
+                    Projects = e.EmployeesProjects
+                        .Select(ep => ep.Project.Name)
+                        .OrderBy(pn => pn)
+                        .ToList()
+                })
+                .FirstOrDefault();
+
+        if (employee == null)
+        {
+            return "Employee not found.";
+        }
+
+        var result = new StringBuilder();
+
+        result.AppendLine($"{employee.FirstName} {employee.LastName} - {employee.JobTitle}");
+
+        foreach (var projectName in employee.Projects)
+        {
+            result.AppendLine($"{projectName}");
+        }
+
+        return result.ToString().TrimEnd();
+    }
+
+    // Problem 09.
 }
