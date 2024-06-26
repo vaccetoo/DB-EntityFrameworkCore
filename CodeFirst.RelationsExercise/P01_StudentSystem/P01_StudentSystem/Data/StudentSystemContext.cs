@@ -10,6 +10,7 @@ namespace P01_StudentSystem.Data
 {
     public class StudentSystemContext : DbContext
     {
+        // NOT A PLACE FOR CONNECTION STRING !!! Using localDb placed it here hust for the demo
         private const string ConnectionString = "Server=Asus-Tuf;Database=StudentSystem;Integrated Security=True;";
         public StudentSystemContext()
         {
