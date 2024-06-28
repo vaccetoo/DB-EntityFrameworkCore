@@ -11,6 +11,12 @@ namespace P02_FootballBetting.Data.Models
 {
     public class Town
     {
+        public Town()
+        {
+            Teams = new HashSet<Team>();
+            Players = new HashSet<Player>();
+        }
+
         [Key]
         public int TownId { get; set; }
 
@@ -21,5 +27,8 @@ namespace P02_FootballBetting.Data.Models
         public int CountryId { get; set; }
         [ForeignKey(nameof(CountryId))]
         public Country Country { get; set; } = null!;
+
+        public ICollection<Team> Teams { get; set; } = null!;
+        public ICollection<Player> Players { get; set; } = null!;
     }
 }

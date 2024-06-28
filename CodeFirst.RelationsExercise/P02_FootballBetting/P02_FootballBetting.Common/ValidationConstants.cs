@@ -16,6 +16,7 @@ namespace P02_FootballBetting.Common
         public const int TeamNameMaxLength = 64;
         public const int UrlMaxLength = 100;
         public const int InitialsMaxLength = 3;
+        public const int PlayerNumberMaxLength = 2;
     }
 
 }
