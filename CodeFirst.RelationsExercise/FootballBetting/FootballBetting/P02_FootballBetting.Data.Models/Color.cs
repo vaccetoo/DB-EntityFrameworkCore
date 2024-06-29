@@ -10,21 +10,11 @@ namespace P02_FootballBetting.Data.Models
 {
     public class Color
     {
-        public Color()
-        {
-            PrimaryKitTeams = new HashSet<Team>();
-            SecondaryKitTeams = new HashSet<Team>();
-        }
-
-        [Key]
+        [Key]   
         public int ColorId { get; set; }
 
-        [MaxLength(ValidationConstants.ColorNameMaxLength)]
         [Required]
+        [MaxLength(GlobalConstants.ColorNameMaxLength)]
         public string Name { get; set; } = null!;
-
-        public ICollection<Team> PrimaryKitTeams { get; set; } = null!;
-
-        public ICollection<Team> SecondaryKitTeams { get; set; } = null!;
     }
 }

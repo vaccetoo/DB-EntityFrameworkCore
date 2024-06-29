@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace P02_FootballBetting.Data.Models
+namespace P02_FootballBetting.Common
 {
-    public class PlayerStatistic
+    public enum Result
     {
-        public int MyProperty { get; set; }
+        HomeWin = 1,
+        AwayWin = 2,
+        Draw = 3
     }
 }

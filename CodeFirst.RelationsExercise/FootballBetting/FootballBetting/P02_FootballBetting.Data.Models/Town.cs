@@ -8,20 +8,16 @@ using System.Threading.Tasks;
 
 namespace P02_FootballBetting.Data.Models
 {
-    public class Country
+    public class Town
     {
-        public Country()
-        {
-            Towns = new HashSet<Town>();
-        }
-
-        [Key]
-        public int CountryId { get; set; }
+        [Key]   
+        public int TownId { get; set; }
 
         [Required]
-        [MaxLength(ValidationConstants.CountryNameMaxLength)]
+        [MaxLength(GlobalConstants.TownNameMaxLength)]
         public string Name { get; set; } = null!;
 
-        public ICollection<Town> Towns { get; set; } = null!;
+        //TODO: Relation !!!
+        public int CountryId { get; set; }  
     }
 }
