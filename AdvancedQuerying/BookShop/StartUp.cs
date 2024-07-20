@@ -58,7 +58,16 @@
             //Console.WriteLine(CountCopiesByAuthor(context));
 
             // 12.
-            Console.WriteLine(GetTotalProfitByCategory(context));
+            //Console.WriteLine(GetTotalProfitByCategory(context));
+
+            // 13.
+            //Console.WriteLine(GetMostRecentBooks(context));
+
+            // 14.
+            //IncreasePrices(context);
+
+            // 15.
+            //Console.WriteLine(RemoveBooks(context)); 
 
         }
 
@@ -257,25 +266,76 @@
         // 12.
         public static string GetTotalProfitByCategory(BookShopContext context)
         {
-            var categoryProfits = context.BooksCategories
-           .GroupBy(bc => bc.Category.Name)
-           .Select(g => new
-           {
-               Category = g.Key,
-               TotalProfit = g.Sum(bc => bc.Book.Price * bc.Book.Copies)
-           })
-           .OrderByDescending(c => c.TotalProfit)
-           .ThenBy(c => c.Category)
-           .ToList();
+            var categoryProfits = context.Categories
+                .Select(c => new
+                {
+                    c.Name,
+                    Profit = c.CategoryBooks.Sum(cb => cb.Book.Price * cb.Book.Copies)
+                })
+                .OrderByDescending(c => c.Profit)
+                .ThenBy(c => c.Name)
+                .ToArray();
 
-            StringBuilder result = new StringBuilder();
+                return string.Join(Environment.NewLine, categoryProfits.Select(cbp => $"{cbp.Name} ${cbp.Profit:f2}"));
+        }
 
-            foreach (var categoryProfit in categoryProfits)
+        // 13.
+        public static string GetMostRecentBooks(BookShopContext context)
+        {
+            var mostrecentBooks = context.Categories
+                .Select(c => new
+                {
+                    c.Name,
+                    MostRecentBooks = c.CategoryBooks
+                    .OrderByDescending(b => b.Book.ReleaseDate)
+                    .Take(3)
+                    .Select(b => $"{b.Book.Title} ({b.Book.ReleaseDate.Value.Year})")
+                })
+                .ToList()
+                .OrderBy(c => c.Name)
+                .ToList();
+
+            var result = new StringBuilder();
+
+            foreach (var book in mostrecentBooks)
             {
-                result.AppendLine($"{categoryProfit.Category} ${categoryProfit.TotalProfit:f2}");
+                result.AppendLine($"--{book.Name}");
+
+                foreach (var b in book.MostRecentBooks)
+                {
+                    result.AppendLine(b);
+                }
             }
 
             return result.ToString().TrimEnd();
+        }
+
+        // 14.
+        public static void IncreasePrices(BookShopContext context)
+        {
+            var books = context.Books
+                .Where(b => b.ReleaseDate.Value.Year < 2010)
+                .ToList();
+
+            foreach (var book in books)
+            {
+                book.Price += 5;
+            }
+
+            context.SaveChanges();
+        }
+
+        // 15.
+        public static int RemoveBooks(BookShopContext context)
+        {
+            var books = context.Books
+                .Where(b => b.Copies < 4200)
+                .ToList();
+
+            context.RemoveRange(books);
+            context.SaveChanges();
+
+            return books.Count();
         }
     }
 }
