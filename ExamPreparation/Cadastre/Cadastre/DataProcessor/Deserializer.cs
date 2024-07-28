@@ -24,7 +24,80 @@ namespace Cadastre.DataProcessor
         {
             var districtsDto = XmlSerializationHelper.Deserialize<List<ImportDistrictDto>>(xmlDocument, "Districts");
 
-            return "";
+            List<District> districts = new List<District>();
+
+            var result = new StringBuilder();
+
+            foreach (var districtDto in districtsDto)
+            {
+                if (!IsValid(districtDto))
+                {
+                    result.AppendLine(ErrorMessage);
+                    continue;
+                }
+
+                Region region;
+                if (!Enum.TryParse<Region>(districtDto.Region, out region))
+                {
+                    result.AppendLine(ErrorMessage);
+                    continue;
+                }
+
+                if (districts.Any(d => d.Name == districtDto.Name))
+                {
+                    result.AppendLine(ErrorMessage);
+                    continue;
+                }
+
+                District district = new District()
+                {
+                    Name = districtDto.Name,
+                    PostalCode = districtDto.PostalCode,
+                    Region = region
+                };
+
+                foreach (var propDto in districtDto.Properties)
+                {
+                    if (!IsValid(propDto))
+                    {
+                        result.AppendLine(ErrorMessage);
+                    }
+
+                    DateTime dateOfAcquisition;
+                    if (!DateTime.TryParseExact(propDto.DateOfAcquisition, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateOfAcquisition))
+                    {
+                        result.AppendLine(ErrorMessage);
+                        continue;
+                    }
+
+                    if (dbContext.Properties.Any(p => p.PropertyIdentifier == propDto.PropertyIdentifier) ||
+                        (district.Properties.Any(p => p.PropertyIdentifier == propDto.PropertyIdentifier) ||
+                        (dbContext.Properties.Any(p => p.Address == propDto.Address) || 
+                        (district.Properties.Any(p => p.Address == propDto.Address)))))
+                    {
+                        districts.Add(district);
+                        result.AppendLine(ErrorMessage);
+                        continue;
+                    }
+
+                    district.Properties.Add(new Property()
+                    {
+                        PropertyIdentifier = propDto.PropertyIdentifier,
+                        Area = propDto.Area,
+                        Details = propDto.Details,
+                        Address = propDto.Address,
+                        DateOfAcquisition = dateOfAcquisition
+                    });
+                }
+
+                districts.Add(district);
+                result.AppendLine(string.Format(SuccessfullyImportedDistrict, district.Name, district.Properties.Count));
+            }
+
+            dbContext.Districts.AddRange(districts);
+            dbContext.SaveChanges();
+
+            return result.ToString().TrimEnd();
         }
 
         public static string ImportCitizens(CadastreContext dbContext, string jsonDocument)
@@ -98,6 +171,7 @@ namespace Cadastre.DataProcessor
             dbContext.Citizens.AddRange(citizens);
             dbContext.SaveChanges();
 
+            Console.WriteLine(dbContext.PropertiesCitizens.Count());
             return result.ToString().TrimEnd();
         }
 

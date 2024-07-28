@@ -78,7 +78,7 @@ namespace Cadastre.Helpers
                 XmlWriterSettings settings = new()
                 {
                     OmitXmlDeclaration = omitXmlDeclaration,
-                    Indent = true
+                    Indent = true,
                 };
 
                 StringBuilder sb = new();
